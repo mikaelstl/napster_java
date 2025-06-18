@@ -1,0 +1,14 @@
+services:
+  rabbitmq:
+    image: "rabbitmq:4.0.1-management"
+    container_name: mensageria
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+networks:
+  rabbitmq-net:
+    external: true
+
+volumes:
+  pgdata:
