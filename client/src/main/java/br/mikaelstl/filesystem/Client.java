@@ -1,32 +1,44 @@
 package br.mikaelstl.filesystem;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Client implements Runnable {
-  private Logger logger;
+  private final Logger logger;
 
   Client() {
-    this.logger = Logger.getLogger("CLIENT");
+    this.logger = LoggerFactory.getLogger(Client.class);
   }
 
   @Override
   public void run() {
     try (
-      Socket connection = new Socket("127.0.0.1", 6061);
+      Socket connection = new Socket("192.168.0.5", 1234);
       DataInputStream input = new DataInputStream(connection.getInputStream());  
-      DataOutputStream output = new DataOutputStream(connection.getOutputStream())
+      DataOutputStream output = new DataOutputStream(connection.getOutputStream());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))
     ) {
+      String command = "";
+      while (true) {
+        command = reader.readLine();
+        output.writeUTF(command);
 
-      output.writeUTF("CLIENTE ACESSANDO");
+        String response = input.readUTF();
+        logger.info(response);
 
-      logger.log(Level.INFO, input.readUTF());
+        if (command.contains("LEAVE")) {
+          break;
+        }
+      }
       
     } catch (Exception e) {
-      this.logger.warning(e.getLocalizedMessage());
+      this.logger.error(e.toString());
     }
   }
 }
