@@ -24,17 +24,16 @@ public class Client implements Runnable {
       DataOutputStream output = new DataOutputStream(connection.getOutputStream());
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))
     ) {
-      String command = "";
-      while (true) {
-        command = reader.readLine();
+      String command;
+      while (
+        !(command = reader.readLine()).contains("LEAVE")
+      ) {
+        
         output.writeUTF(command);
 
         String response = input.readUTF();
         logger.info(response);
-
-        if (command.contains("LEAVE")) {
-          break;
-        }
+        
       }
       
     } catch (Exception e) {
