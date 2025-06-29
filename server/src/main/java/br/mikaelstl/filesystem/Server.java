@@ -142,11 +142,39 @@ public class Server {
     }
   }
 
+  String deleteFile(String[] args) {
+    logger.info(Arrays.toString(args));
+    try {
+      String ip = args[1];
+      if (ip.isEmpty()) {
+        return "ERROR Missing ip address";
+      }
+      String filename = args[2];
+      if (filename.isEmpty()) {
+        return "ERROR Missing filename";
+      }
+
+      Optional<Client> client = clients.stream().filter((c -> c.ipAddress().equals(ip))).findFirst();
+
+      if (client.isPresent()) {
+        client.get().files().removeIf((file -> file.filename().equals(filename)));
+        return "CONFIRMDELETEFILE " + filename;
+      }
+
+      return "ERROR Ip address not founded";
+    } catch (Exception e) {
+      logger.error("ERROR: ", e);
+      return "ERROR Missing filename / file size";
+    }
+  }
+
   void setCommands() {
     commands.put("JOIN", this::handleJoin);
     commands.put("LEAVE", this::handleLeave);
     commands.put("SEARCH", this::handleSearch);
     commands.put("CREATEFILE", this::createFile);
+    commands.put("DELETEFILE", this::deleteFile);
+    // commands.put("GET", this::getFile);
   }
 
   class ClientHandler implements Runnable {
