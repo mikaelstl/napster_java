@@ -50,7 +50,6 @@ public class Client implements Runnable {
   @Override
   public void run() {
     try (
-      ServerSocket server = new ServerSocket(Enviroment.SERVER_PORT);
       Socket connection = new Socket("192.168.0.2", Enviroment.CLIENT_PORT);
       DataInputStream input = new DataInputStream(connection.getInputStream());  
       DataOutputStream output = new DataOutputStream(connection.getOutputStream());
@@ -58,8 +57,6 @@ public class Client implements Runnable {
     ) {
       String command;
       while (true) {
-        clientConnection = server.accept();
-        
         command = reader.readLine();
 
         String[] parts = command.split(" ");

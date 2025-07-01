@@ -9,6 +9,9 @@ public class App
         Client client = new Client();
         new Thread(() -> client.run()).start();
 
-        new Thread(() -> new ClientServer().start()).start();
+        new Thread(() -> {
+            var clientConnection = new ClientServer().start();
+            client.setClientConnection(clientConnection);
+        }).start();
     }
 }
