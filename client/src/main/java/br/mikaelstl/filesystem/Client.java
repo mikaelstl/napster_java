@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +50,7 @@ public class Client implements Runnable {
   @Override
   public void run() {
     try (
+      ServerSocket server = new ServerSocket(Enviroment.SERVER_PORT);
       Socket connection = new Socket("192.168.0.2", Enviroment.CLIENT_PORT);
       DataInputStream input = new DataInputStream(connection.getInputStream());  
       DataOutputStream output = new DataOutputStream(connection.getOutputStream());
@@ -56,6 +58,8 @@ public class Client implements Runnable {
     ) {
       String command;
       while (true) {
+        clientConnection = server.accept();
+        
         command = reader.readLine();
 
         String[] parts = command.split(" ");
@@ -72,6 +76,7 @@ public class Client implements Runnable {
         logger.info(response);
 
         if (command.contains("LEAVE")) {
+          // clientConnection.;
           break;
         }
         
