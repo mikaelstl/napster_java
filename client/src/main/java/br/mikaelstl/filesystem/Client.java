@@ -106,8 +106,6 @@ public class Client implements Runnable {
         output.writeUTF("ERROR This client is offline");
         return;
       }
-
-      logger.info("Connected with client... Ready to download files.");
       
       Path destination = Enviroment.SHARED_FOLDER.resolve(filename);
       downloadFile(destination, input, output);
@@ -124,6 +122,10 @@ public class Client implements Runnable {
   ) {
     try {
       long fileSize = input.readLong();
+      if (fileSize == -1) {
+        logger.error("ERROR File not founded");
+        return;
+      }
 
       try (OutputStream outputFile = Files.newOutputStream(destination)) {
         byte[] buffer = new byte[4096];

@@ -33,13 +33,12 @@ public class ClientFileTranfer implements Runnable {
       DataOutputStream output = new DataOutputStream(socket.getOutputStream());
     ) {
       logger.info("CONNECTED WITH: " + socket.getInetAddress());
-      output.writeUTF("CONNECTED WITH: "+socket.getLocalAddress());
 
       String filename = input.readUTF();
 
       Path filePath = Enviroment.SHARED_FOLDER.resolve(filename);
       if (!Files.exists(filePath)) {
-        output.writeUTF("ERROR: File not found");
+        output.writeLong(-1);
         return;
       }
       var fileSize = Files.size(filePath);
