@@ -20,17 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import br.mikaelstl.filesystem.env.Enviroment;
 import br.mikaelstl.filesystem.server.ClientFileTranfer;
+import br.mikaelstl.filesystem.server.ClientServer;
 
 public class Client implements Runnable {
   private final Logger logger;
 
   private final Map<String, Consumer<String[]>> commands = new HashMap<>();
-
-  private Socket clientConnection;
-
-  public void setClientConnection(Socket clientConnection) {
-    this.clientConnection = clientConnection;
-  }
 
   public Client() {
     this.logger = LoggerFactory.getLogger(Client.class);
@@ -38,6 +33,8 @@ public class Client implements Runnable {
     commands.put("GET", this::getFile);
     
     createDirs();
+
+    startFileServer();
   }
 
   public void createDirs() {
@@ -103,20 +100,17 @@ public class Client implements Runnable {
       DataOutputStream output = new DataOutputStream(socket.getOutputStream());
     ) {
 
-      if (clientConnection.isClosed()) {
+      output.writeUTF(filename);
+
+      if (socket.isClosed()) {
         output.writeUTF("ERROR This client is offline");
         return;
       }
 
       logger.info("Connected with client... Ready to download files.");
       
-      new Thread(() -> {
-        new ClientFileTranfer(clientConnection, filename);
-        
-        Path destination = Enviroment.SHARED_FOLDER.resolve(filename);
-        downloadFile(destination, input, output);
-
-      }).start();
+      Path destination = Enviroment.SHARED_FOLDER.resolve(filename);
+      downloadFile(destination, input, output);
       
     } catch (Exception e) {
       logger.error(e.toString()+": "+e.getMessage());
@@ -149,4 +143,9 @@ public class Client implements Runnable {
       logger.error(e.toString()+": "+e.getMessage());
     }
   }
+
+  public void startFileServer() {
+    new Thread(() -> new ClientServer().start()).start();
+  }
+
 }

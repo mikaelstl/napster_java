@@ -7,28 +7,21 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.mikaelstl.filesystem.env.Command;
 import br.mikaelstl.filesystem.env.Enviroment;
 
 public class ClientFileTranfer implements Runnable {
   
   private final Socket socket;
-  private final String filename;
 
   private final Logger logger;
 
-  // private final Map<String, Command<String[], DataOutputStream>> commands = new HashMap<>();
 
-  public ClientFileTranfer(Socket socket, String filename) {
+  public ClientFileTranfer(Socket socket/* , String filename */) {
     this.socket = socket;
-    this.filename = filename;
     this.logger = LoggerFactory.getLogger(ClientFileTranfer.class);
     // commands.put("GET", this::getFile);
   }
@@ -41,6 +34,8 @@ public class ClientFileTranfer implements Runnable {
     ) {
       logger.info("CONNECTED WITH: " + socket.getInetAddress());
       output.writeUTF("CONNECTED WITH: "+socket.getLocalAddress());
+
+      String filename = input.readUTF();
 
       Path filePath = Enviroment.SHARED_FOLDER.resolve(filename);
       if (!Files.exists(filePath)) {
