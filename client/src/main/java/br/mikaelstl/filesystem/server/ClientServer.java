@@ -6,19 +6,18 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.mikaelstl.filesystem.env.Enviroment;
+
 public class ClientServer {
   private final Logger logger;
 
-  private final int CLIENT_PORT;
-
   public ClientServer() {
     this.logger = LoggerFactory.getLogger(ClientServer.class);
-    CLIENT_PORT = 1235;
   }
 
   public Socket start() {
     try (
-      ServerSocket server = new ServerSocket(CLIENT_PORT);
+      ServerSocket server = new ServerSocket(Enviroment.SERVER_PORT);
     ) {
       while (true) {
         Socket connection = server.accept();
