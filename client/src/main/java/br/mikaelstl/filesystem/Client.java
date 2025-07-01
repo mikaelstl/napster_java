@@ -36,9 +36,11 @@ public class Client implements Runnable {
     commands.put("GET", this::getFile);
     
     clientConnection = new ClientServer().start();
+
+    createDirs();
   }
 
-  public void createPath() {
+  public void createDirs() {
     File dir = Enviroment.SHARED_FOLDER.toFile();
     if (!dir.exists()) {
       dir.mkdirs();
