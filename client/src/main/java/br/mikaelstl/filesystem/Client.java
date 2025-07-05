@@ -23,11 +23,15 @@ import br.mikaelstl.filesystem.server.ClientFileTranfer;
 import br.mikaelstl.filesystem.server.ClientServer;
 
 public class Client implements Runnable {
+  private final ClientServer server;
+  private Thread serverThread;
+
   private final Logger logger;
 
   private final Map<String, Consumer<String[]>> commands = new HashMap<>();
 
   public Client() {
+    server = new ClientServer();
     this.logger = LoggerFactory.getLogger(Client.class);
     // commands.put("CONNECT", this::connectWithClient);
     commands.put("GET", this::getFile);
@@ -47,7 +51,7 @@ public class Client implements Runnable {
   @Override
   public void run() {
     try (
-      Socket connection = new Socket("192.168.0.2", Enviroment.CLIENT_PORT);
+      Socket connection = new Socket("192.168.0.4", Enviroment.CLIENT_PORT);
       DataInputStream input = new DataInputStream(connection.getInputStream());  
       DataOutputStream output = new DataOutputStream(connection.getOutputStream());
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -70,7 +74,7 @@ public class Client implements Runnable {
         logger.info(response);
 
         if (command.contains("LEAVE")) {
-          // clientConnection.;
+          closeFileServer();
           break;
         }
         
@@ -147,7 +151,13 @@ public class Client implements Runnable {
   }
 
   public void startFileServer() {
-    new Thread(() -> new ClientServer().start()).start();
+    serverThread = new Thread(() -> server.start());
+    serverThread.start();
+  }
+
+  public void closeFileServer() {
+    server.stop();
+    serverThread.interrupt();
   }
 
 }
